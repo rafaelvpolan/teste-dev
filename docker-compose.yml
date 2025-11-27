@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: myapp
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+  back-end-node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: back-end-node
+    restart: always
+    ports:
+      - "3005:3005"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - mysql
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USERNAME=user
+      - DB_PASSWORD=password123
+      - DB_DATABASE=myapp
+      - NODE_ENV=production
+      - PORT=3005
+
+volumes:
+  mysql_data:
